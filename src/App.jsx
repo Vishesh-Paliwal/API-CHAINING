@@ -1,9 +1,12 @@
-import './App.css'
+import React from 'react';
+import Dashboard from './pages/Dashboard';
 
-function App() {
+const App = () => {
   return (
-    <div></div>
-  )
-}
+    <div className="min-h-screen bg-gray-100">
+      <Dashboard />
+    </div>
+  );
+};
 
-export default App
+export default App;
