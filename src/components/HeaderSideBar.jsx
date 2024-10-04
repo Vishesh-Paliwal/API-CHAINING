@@ -32,13 +32,13 @@ function HeaderSideBar() {
               placeholder="Header Name"
               value={header.name}
               onChange={(e) => handleInputChange(index, 'name', e.target.value)}
-              className="w-full bg-gray-700 text-white p-1 mb-2 rounded"
+              className="w-full bg-regal-blue text-white p-1 mb-2 rounded"
             />
             <textarea
               placeholder="Content"
               value={header.content}
               onChange={(e) => handleInputChange(index, 'content', e.target.value)}
-              className="w-full bg-gray-700 text-white p-1 rounded"
+              className="w-full bg-gray-600 text-white p-1 rounded"
             />
           </div>
         ))}
