@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getUsers, createPost, getCommentsByPostId } from '../api/apiService';
-import { FaPencilAlt, FaPaperPlane } from 'react-icons/fa'; 
+import { FaPencilAlt, FaPaperPlane } from 'react-icons/fa';
 
 function TestingField() {
-  // State management
   const [requestBody, setRequestBody] = useState('');
   const [expectedResponse, setExpectedResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isEditing, setIsEditing] = useState(false); // New state for editing
+  const [isEditing, setIsEditing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [currentAction, setCurrentAction] = useState('');
 
-  // Handlers for each API call
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers();
+      setUsers(response.data);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  };
+
   const executeGetUsers = async () => {
     setLoading(true);
     setError(null);
@@ -27,70 +41,57 @@ function TestingField() {
     }
   };
 
-  const executeCreatePost = async () => {
-    setLoading(true);
-    setError(null);
-    setExpectedResponse("Loading...");
-    const request = {
+  const executeCreatePost = () => {
+    setCurrentAction('createPost');
+    setRequestBody(JSON.stringify({
       title: 'Sample Post',
       body: 'This is a sample post.',
-      userId: 1, // Hardcoded userId for now
-    };
-    try {
-      setRequestBody(JSON.stringify(request, null, 2));
-      const response = await createPost(request);
-      setExpectedResponse(JSON.stringify(response.data, null, 2));
-    } catch (err) {
-      setError(err.message);
-      setExpectedResponse(`Error: ${err.message}`);
-    } finally {
-      setLoading(false);
+      userId: 1, // Default userId
+    }, null, 2));
+  };
+
+  const executeGetCommentsByPostId = () => {
+    setCurrentAction('getComments');
+    setRequestBody(`No request body required. Query param used: postId=1`); // Default postId
+  };
+
+  const handleUserSelect = (userId) => {
+    setIsModalOpen(false);
+    if (currentAction === 'createPost') {
+      setRequestBody(prevBody => {
+        const bodyObj = JSON.parse(prevBody);
+        bodyObj.userId = userId;
+        return JSON.stringify(bodyObj, null, 2);
+      });
+    } else if (currentAction === 'getComments') {
+      setRequestBody(`No request body required. Query param used: postId=${userId}`);
     }
   };
 
-  const executeGetCommentsByPostId = async (postId = 1) => {
-    setLoading(true);
-    setError(null);
-    setExpectedResponse("Loading...");
-    try {
-      setRequestBody(`No request body required. Query param used: postId=${postId}`); // Update the request body display
-      const response = await getCommentsByPostId(postId);
-      setExpectedResponse(JSON.stringify(response.data, null, 2));
-    } catch (err) {
-      setError(err.message);
-      setExpectedResponse(`Error: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle edit click
   const handleEditClick = () => {
     setIsEditing(true);
+    setIsModalOpen(true);
   };
 
-  // Handle send click (send updated request)
   const handleSendClick = async () => {
-    setIsEditing(false); // Disable editing
+    setIsEditing(false);
     setLoading(true);
     setError(null);
     setExpectedResponse("Loading...");
 
     try {
-      // Check if the requestBody contains postId
       if (requestBody.includes('postId')) {
-        // Extract the postId from the requestBody
         const postIdMatch = requestBody.match(/postId=(\d+)/);
         if (postIdMatch && postIdMatch[1]) {
           const postId = parseInt(postIdMatch[1], 10);
-          await executeGetCommentsByPostId(postId); // Use the new postId to fetch comments
+          const response = await getCommentsByPostId(postId);
+          setExpectedResponse(JSON.stringify(response.data, null, 2));
         } else {
           throw new Error("Invalid postId in request body");
         }
       } else {
-        // For other types of requests (like createPost)
-        const parsedRequest = JSON.parse(requestBody); // Parse only if it's a valid JSON body
-        const response = await createPost(parsedRequest); // Resubmit with new data
+        const parsedRequest = JSON.parse(requestBody);
+        const response = await createPost(parsedRequest);
         setExpectedResponse(JSON.stringify(response.data, null, 2));
       }
     } catch (err) {
@@ -129,7 +130,6 @@ function TestingField() {
           />
           <h3 className="text-md font-semibold mb-2">API Sequences</h3>
           <div className="bg-gray-700 h-3/4 rounded p-2">
-            {/* Buttons for API sequence */}
             <button
               className="w-full bg-regal-blue text-white p-2 mb-2 rounded"
               onClick={executeGetUsers}
@@ -146,7 +146,7 @@ function TestingField() {
             </button>
             <button
               className="w-full bg-regal-blue text-white p-2 mb-2 rounded"
-              onClick={() => executeGetCommentsByPostId()}
+              onClick={executeGetCommentsByPostId}
               disabled={loading}
             >
               Get Comments By Post ID
@@ -165,7 +165,6 @@ function TestingField() {
 
           <h3 className="text-md font-semibold mb-2">Request</h3>
           <div className="bg-gray-600 h-1/2 rounded p-2 mb-4 relative">
-            {/* Request Display */}
             <textarea
               placeholder="Request will be displayed here"
               className="w-full h-full bg-gray-600 text-white p-1 rounded"
@@ -187,7 +186,6 @@ function TestingField() {
 
           <h3 className="text-md font-semibold mb-2">Expected Response</h3>
           <div className="bg-gray-600 h-1/2 rounded p-2">
-            {/* Expected Response Display */}
             <textarea
               placeholder="Expected response will be displayed here"
               className="w-full h-full bg-gray-600 text-white p-1 rounded"
@@ -197,6 +195,37 @@ function TestingField() {
           </div>
         </div>
       </div>
+
+      {/* Custom Modal */}
+      {isModalOpen && (
+        <div className="translate-x-96 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-black text-white p-4 rounded-lg w-96 border-white border-x-2 border-y-2">
+          <div className=" p-2">Select API</div>
+          <select className="w-full bg-gray-700 text-white p-2 mb-4 rounded">
+            <option value="low">Get User</option>
+            <option value="medium">Create Post</option>
+          </select>
+          <div className="p-2">Response Body</div>
+            <div className="max-h-56 overflow-y-auto border-regal-blue border-2">
+              {users.map(user => (
+                <div
+                  key={user.id}
+                  className="p-2 hover:border-pink-400 hover:border-l-2 hover:rounded cursor-pointer"
+                  onClick={() => handleUserSelect(user.id)}
+                >
+                  {user.name} (ID: {user.id})
+                </div>
+              ))}
+            </div>
+            <button
+              className="mt-4 bg-pink-400 text-white px-4 py-2 rounded"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Import
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
