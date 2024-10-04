@@ -4,6 +4,7 @@ import ApiDisplay from '../components/ApiDisplay';
 import useApiChain from '../hooks/apiChain';
 import SideBar from '../components/SideBar';
 import HeaderSideBar from '../components/HeaderSideBar';
+import TestingField from '../components/TestingField';
 
 const Dashboard = () => {
   const { data, loading, error, chainApis } = useApiChain();
@@ -11,7 +12,7 @@ const Dashboard = () => {
   return (
     <div className="text-white flex" style={{ height: '100vh' }} >
         <SideBar/>
-        <div className="w-3/5 h-full bg-regal-blue border-yellow-50 border-x-2">b</div>
+        <TestingField/>
         <HeaderSideBar/>
     </div>
   );
