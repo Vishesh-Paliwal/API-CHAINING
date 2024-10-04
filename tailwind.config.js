@@ -10,7 +10,7 @@ export default {
         'regal-blue': '#1b1e26',
         'black' : '#14181d',
         'yellow-50' : '#282c31',
-        'green-300' : '#302328'
+        'green-300' : '#302328',
       },
     },
   },
