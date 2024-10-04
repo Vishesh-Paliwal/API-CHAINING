@@ -2,17 +2,25 @@ import React from 'react';
 import ApiChainBuilder from '../components/ApiChainBuilder';
 import ApiDisplay from '../components/ApiDisplay';
 import useApiChain from '../hooks/apiChain';
+import SideBar from '../components/SideBar';
 
 const Dashboard = () => {
   const { data, loading, error, chainApis } = useApiChain();
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">API Chaining Dashboard</h1>
-      <ApiChainBuilder onChainApis={chainApis} />
-      <ApiDisplay data={data} loading={loading} error={error} />
+    <div className="text-white flex" style={{ height: '100vh' }} >
+        <SideBar/>
+        <div className="w-3/5 h-full bg-regal-blue border-yellow-50 border-x-2">b</div>
+        <div className="w-1/5 h-full bg-black">c</div>
     </div>
   );
 };
 
 export default Dashboard;
+
+
+
+
+{/* <h1 className="text-2xl font-bold mb-4">API Chaining Dashboard</h1>
+<ApiChainBuilder onChainApis={chainApis} />
+<ApiDisplay data={data} loading={loading} error={error} /> */}
