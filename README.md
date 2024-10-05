@@ -28,7 +28,7 @@ Setup Instructions
     
    # Completed Features
     
-  * Responsive UI: A clean and intuitive interface using React and Tailwind CSS.
+  * UI: A clean and intuitive interface using React and Tailwind CSS.
   * API Implementation: Functional APIs for:
             Fetching users (getUsers)
             Creating posts (createPost)

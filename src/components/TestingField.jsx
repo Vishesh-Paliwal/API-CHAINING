@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getUsers, createPost, getCommentsByPostId } from '../api/apiService';
 import { FaPencilAlt, FaPaperPlane } from 'react-icons/fa';
 

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const ApiChainBuilder = ({ onChainApis }) => {
   return (
     <div className="p-4">
